@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WorkConnect</title>
+    <title>WorkConnect - Labor Connection Platform</title>
     <style>
         * {
             margin: 0;
@@ -131,7 +131,7 @@
 
         input:focus, select:focus, textarea:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #1e3c72;
         }
 
         .btn {
@@ -161,7 +161,7 @@
         }
 
         .role-box {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1e3c72 0%, #7e22ce 100%);
             padding: 60px 30px;
             border-radius: 15px;
             text-align: center;
@@ -172,7 +172,7 @@
 
         .role-box:hover {
             transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 15px 30px rgba(126, 34, 206, 0.4);
         }
 
         .role-box h2 {
@@ -232,7 +232,7 @@
             width: 80px;
             height: 80px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1e3c72 0%, #7e22ce 100%);
             margin: 0 auto 15px;
             display: flex;
             align-items: center;
@@ -280,7 +280,7 @@
         }
 
         .skill-badge {
-            background: #667eea;
+            background: #1e3c72;
             color: white;
             padding: 5px 12px;
             border-radius: 20px;
@@ -543,7 +543,7 @@
     </div>
 
     <script>
-        const sampleWorkers = {
+        var sampleWorkers = {
             'Masonry': [
                 { name: 'Rajesh Kumar', experience: '8 years', location: 'Mumbai', skills: ['Brick laying', 'Stone work'], rating: 4.5 },
                 { name: 'Amit Patel', experience: '5 years', location: 'Ahmedabad', skills: ['Plastering', 'Tiling'], rating: 4.8 },
@@ -574,11 +574,23 @@
             ]
         };
 
-        let userProfiles = [];
-        let businessUserLocation = '';
+        var userProfiles = [];
+        var businessUserLocation = '';
+
+        function showPage(pageId) {
+            var pages = document.querySelectorAll('.page');
+            for (var i = 0; i < pages.length; i++) {
+                pages[i].classList.remove('active');
+            }
+            document.getElementById(pageId).classList.add('active');
+        }
+
+        function login() {
+            showPage('dashboardPage');
+        }
 
         function setLocationAndShowCategories() {
-            const location = document.getElementById('businessLocation').value.trim();
+            var location = document.getElementById('businessLocation').value.trim();
             if (!location) {
                 alert('Please enter your location');
                 return;
@@ -588,91 +600,90 @@
             document.getElementById('businessLocation').parentElement.parentElement.style.display = 'none';
         }
 
-        function showPage(pageId) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active');
-        }
-
-        function login() {
-            showPage('dashboardPage');
-        }
-
         function showWorkers(category) {
             document.getElementById('categoryTitle').textContent = category + ' Professionals in ' + businessUserLocation;
-            const grid = document.getElementById('workersGrid');
+            var grid = document.getElementById('workersGrid');
             grid.innerHTML = '';
 
-            const workers = sampleWorkers[category] || [];
+            var workers = sampleWorkers[category] || [];
             
-            // Filter workers by location match
-            const filteredWorkers = workers.filter(worker => 
-                worker.location.toLowerCase().includes(businessUserLocation.toLowerCase()) ||
-                businessUserLocation.toLowerCase().includes(worker.location.toLowerCase())
-            );
+            var filteredWorkers = [];
+            for (var i = 0; i < workers.length; i++) {
+                if (workers[i].location.toLowerCase().indexOf(businessUserLocation.toLowerCase()) !== -1 ||
+                    businessUserLocation.toLowerCase().indexOf(workers[i].location.toLowerCase()) !== -1) {
+                    filteredWorkers.push(workers[i]);
+                }
+            }
 
-            // If no workers in exact location, show nearby workers
-            const workersToShow = filteredWorkers.length > 0 ? filteredWorkers : workers;
+            var workersToShow = filteredWorkers.length > 0 ? filteredWorkers : workers;
             
             if (filteredWorkers.length === 0) {
                 grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #666; padding: 20px;">No workers found in your exact location. Showing workers from nearby areas:</p>';
             }
 
-            workersToShow.forEach(worker => {
-                grid.innerHTML += createWorkerCard(worker);
-            });
+            for (var j = 0; j < workersToShow.length; j++) {
+                grid.innerHTML += createWorkerCard(workersToShow[j]);
+            }
 
             showPage('workersPage');
         }
 
         function createWorkerCard(worker) {
-            const initial = worker.name.charAt(0);
-            const skillBadges = worker.skills.map(s => `<span class="skill-badge">${s}</span>`).join('');
-            const fullStars = Math.floor(worker.rating);
-            const hasHalfStar = worker.rating % 1 !== 0;
-            const emptyStars = 5 - Math.ceil(worker.rating);
+            var initial = worker.name.charAt(0);
+            var skillBadges = '';
+            for (var i = 0; i < worker.skills.length; i++) {
+                skillBadges += '<span class="skill-badge">' + worker.skills[i] + '</span>';
+            }
             
-            let starsHtml = '★'.repeat(fullStars);
-            if (hasHalfStar) starsHtml += '⯨';
-            starsHtml += '☆'.repeat(emptyStars);
+            var fullStars = Math.floor(worker.rating);
+            var hasHalfStar = worker.rating % 1 !== 0;
+            var emptyStars = 5 - Math.ceil(worker.rating);
             
-            return `
-                <div class="worker-card">
-                    <div class="worker-photo">${initial}</div>
-                    <div class="worker-name">${worker.name}</div>
-                    <div class="rating">
-                        <span class="stars">${starsHtml}</span>
-                        <span class="rating-text">(${worker.rating})</span>
-                    </div>
-                    <div class="worker-info">📍 ${worker.location}</div>
-                    <div class="worker-info">⏱️ ${worker.experience} experience</div>
-                    <div class="skill-badges">${skillBadges}</div>
-                    <button class="hire-btn" onclick="hireWorker('${worker.name}')">Hire Now</button>
-                </div>
-            `;
+            var starsHtml = '';
+            for (var k = 0; k < fullStars; k++) {
+                starsHtml += '★';
+            }
+            if (hasHalfStar) {
+                starsHtml += '⯨';
+            }
+            for (var m = 0; m < emptyStars; m++) {
+                starsHtml += '☆';
+            }
+            
+            return '<div class="worker-card">' +
+                '<div class="worker-photo">' + initial + '</div>' +
+                '<div class="worker-name">' + worker.name + '</div>' +
+                '<div class="rating">' +
+                '<span class="stars">' + starsHtml + '</span>' +
+                '<span class="rating-text">(' + worker.rating + ')</span>' +
+                '</div>' +
+                '<div class="worker-info">📍 ' + worker.location + '</div>' +
+                '<div class="worker-info">⏱️ ' + worker.experience + ' experience</div>' +
+                '<div class="skill-badges">' + skillBadges + '</div>' +
+                '<button class="hire-btn" onclick="hireWorker(\'' + worker.name + '\')">Hire Now</button>' +
+                '</div>';
         }
 
         function hireWorker(name) {
-            alert(`Contact request sent to ${name}! They will reach out to you soon.`);
+            alert('Contact request sent to ' + name + '! They will reach out to you soon.');
         }
 
         function submitLabourForm(e) {
             e.preventDefault();
             
-            const profile = {
+            var profile = {
                 name: document.getElementById('workerName').value,
                 contact: document.getElementById('workerContact').value,
                 email: document.getElementById('workerEmail').value,
                 skill: document.getElementById('workerSkill').value,
                 experience: document.getElementById('workerExperience').value,
                 location: document.getElementById('workerLocation').value,
-                additionalSkills: document.getElementById('additionalSkills').value.split(',').map(s => s.trim()).filter(s => s)
+                additionalSkills: document.getElementById('additionalSkills').value.split(',').map(function(s) { return s.trim(); }).filter(function(s) { return s; })
             };
 
-            // Get the initial
-            const initial = profile.name.charAt(0).toUpperCase();
-            const allSkills = [profile.skill, ...profile.additionalSkills].filter(s => s);
+            var initial = profile.name.charAt(0).toUpperCase();
+            var allSkills = [profile.skill].concat(profile.additionalSkills).filter(function(s) { return s; });
 
-            // Populate the profile card elements
             document.getElementById('profileInitial').textContent = initial;
             document.getElementById('profileName').textContent = profile.name;
             document.getElementById('profileSkill').textContent = profile.skill;
@@ -680,8 +691,7 @@
             document.getElementById('profileLocation').textContent = profile.location;
             document.getElementById('profileExperience').textContent = profile.experience + ' years of experience';
             
-            // Handle email visibility
-            const emailDiv = document.getElementById('profileEmailDiv');
+            var emailDiv = document.getElementById('profileEmailDiv');
             if (profile.email) {
                 document.getElementById('profileEmail').textContent = profile.email;
                 emailDiv.style.display = 'flex';
@@ -689,19 +699,17 @@
                 emailDiv.style.display = 'none';
             }
 
-            // Add skills badges
-            const skillsContainer = document.getElementById('profileSkills');
+            var skillsContainer = document.getElementById('profileSkills');
             skillsContainer.innerHTML = '';
-            allSkills.forEach(skill => {
-                const badge = document.createElement('span');
+            for (var i = 0; i < allSkills.length; i++) {
+                var badge = document.createElement('span');
                 badge.className = 'skill-badge';
                 badge.style.fontSize = '1em';
                 badge.style.padding = '8px 16px';
-                badge.textContent = skill;
+                badge.textContent = allSkills[i];
                 skillsContainer.appendChild(badge);
-            });
+            }
 
-            // Reset form and show profile page
             document.getElementById('labourForm').reset();
             showPage('profileSuccessPage');
         }
